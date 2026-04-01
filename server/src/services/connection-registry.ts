@@ -4,6 +4,7 @@ import { buildPoolConfig, buildPoolFromParts } from "../db/connection.js";
 import { env } from "../config/env.js";
 
 const pools = new Map<string, Pool>();
+const dbInfos = new Map<string, { mode: "demo" | "custom"; label: string }>();
 
 export function registryKey(sessionId: string): string {
   return sessionId;
@@ -20,8 +21,17 @@ export function getPool(sessionId: string): Pool | undefined {
   return pools.get(registryKey(sessionId));
 }
 
+export function setDbInfo(sessionId: string, info: { mode: "demo" | "custom"; label: string }): void {
+  dbInfos.set(registryKey(sessionId), info);
+}
+
+export function getDbInfo(sessionId: string): { mode: "demo" | "custom"; label: string } | undefined {
+  return dbInfos.get(registryKey(sessionId));
+}
+
 export async function disconnectSession(sessionId: string): Promise<void> {
   const key = registryKey(sessionId);
+  dbInfos.delete(key);
   const p = pools.get(key);
   if (p) {
     pools.delete(key);

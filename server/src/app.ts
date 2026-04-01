@@ -27,16 +27,32 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 
+const isVercel = !!process.env.VERCEL || env.nodeEnv === "production";
+
 app.use(
   cookieSession({
     name: "bi.sid",
     keys: [env.sessionSecret], // 'keys' is preferred over 'secret'
     httpOnly: true,
-    sameSite: env.nodeEnv === "production" ? "none" : "lax",
-    secure: env.nodeEnv === "production",
+    sameSite: isVercel ? "none" : "lax",
+    secure: isVercel,
     maxAge: 1000 * 60 * 60 * 24 * 7,
   }),
 );
+
+// Bearer Token Fallback (bypasses 3rd-party cookie blocks)
+app.use((req, res, next) => {
+  const auth = req.headers.authorization;
+  if (auth && auth.startsWith("Bearer ")) {
+    const token = auth.substring(7);
+    if (!req.session) {
+      req.session = {} as any;
+    }
+    (req.session as any).authed = true;
+    (req.session as any).sid = token;
+  }
+  next();
+});
 
 app.use("/api", router);
 app.use(errorHandler);

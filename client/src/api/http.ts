@@ -13,12 +13,20 @@ export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
+  const token = localStorage.getItem("bi_token");
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    credentials: "include",
+    credentials: "omit", // Use token instead of cross-origin cookies
     headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
+      ...headers,
+      ...(init?.headers as Record<string, string> ?? {}),
     },
   });
   const data = await parseJson<{ error?: string } & T>(res);
