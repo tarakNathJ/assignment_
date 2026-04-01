@@ -5,19 +5,14 @@ export interface MeResponse {
   db: { mode: "demo" | "custom"; label: string } | null;
 }
 
-export async function login(username: string, password: string): Promise<{ ok: boolean }> {
-  const result = await apiFetch<{ ok: boolean; token?: string }>("/auth/login", {
+export function login(username: string, password: string): Promise<{ ok: boolean }> {
+  return apiFetch("/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
   });
-  if (result.token) {
-    localStorage.setItem("bi_token", result.token);
-  }
-  return result;
 }
 
-export async function logout(): Promise<{ ok: boolean }> {
-  localStorage.removeItem("bi_token");
+export function logout(): Promise<{ ok: boolean }> {
   return apiFetch("/auth/logout", { method: "POST", body: JSON.stringify({}) });
 }
 
