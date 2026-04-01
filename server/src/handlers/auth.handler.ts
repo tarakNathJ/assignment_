@@ -9,8 +9,9 @@ export function loginHandler(req: Request, res: Response): void {
   const password = String(req.body?.password ?? "");
   if (username === env.demoAuthUser && password === env.demoAuthPassword) {
     req.session.authed = true;
-    req.session.sid = uuidv4();
-    res.json({ ok: true });
+    const sid = uuidv4();
+    req.session.sid = sid;
+    res.json({ ok: true, token: sid });
     return;
   }
   res.status(401).json({ error: "Invalid credentials" });
