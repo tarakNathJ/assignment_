@@ -1,0 +1,64 @@
+{
+  "byId": {
+    "de538e15-4de2-444f-805a-720764647300": {
+      "id": "de538e15-4de2-444f-805a-720764647300",
+      "title": "New Telemetry Stream",
+      "shareToken": "fcd7ff35-5942-42a5-af98-4026b4bd5d59",
+      "widgets": [],
+      "createdAt": "2026-03-30T11:12:43.602Z",
+      "updatedAt": "2026-03-30T11:12:43.602Z"
+    },
+    "65fb42b6-fde5-4d82-9d00-7e77c8f54f96": {
+      "id": "65fb42b6-fde5-4d82-9d00-7e77c8f54f96",
+      "title": "tom",
+      "shareToken": "37db0030-8774-420d-9db2-5e874ce5fb90",
+      "widgets": [
+        {
+          "title": "New Widget",
+          "sql": "SELECT p.name, SUM(oi.unit_price * oi.quantity) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.name ORDER BY revenue DESC LIMIT 5",
+          "chartType": "bar",
+          "snapshotColumns": [
+            "name",
+            "revenue"
+          ],
+          "snapshotRows": [
+            {
+              "name": "Refined Granite Cheese",
+              "revenue": "711071.01"
+            },
+            {
+              "name": "Rustic Concrete Bike",
+              "revenue": "573295.97"
+            },
+            {
+              "name": "Refined Bronze Hat",
+              "revenue": "522006.02"
+            },
+            {
+              "name": "Bespoke Bamboo Cheese",
+              "revenue": "520764.16"
+            },
+            {
+              "name": "Luxurious Granite Chair",
+              "revenue": "518411.58"
+            }
+          ],
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          },
+          "id": "e07a90be-1432-447c-ac92-b2e7f6c69c0f",
+          "createdAt": "2026-04-01T13:53:05.782Z"
+        }
+      ],
+      "createdAt": "2026-03-30T18:44:58.946Z",
+      "updatedAt": "2026-04-01T13:53:05.782Z"
+    }
+  },
+  "byShare": {
+    "fcd7ff35-5942-42a5-af98-4026b4bd5d59": "de538e15-4de2-444f-805a-720764647300",
+    "37db0030-8774-420d-9db2-5e874ce5fb90": "65fb42b6-fde5-4d82-9d00-7e77c8f54f96"
+  }
+}
