@@ -4,7 +4,6 @@ import { buildPoolConfig, buildPoolFromParts } from "../db/connection.js";
 import { env } from "../config/env.js";
 
 const pools = new Map<string, Pool>();
-const dbInfos = new Map<string, { mode: "demo" | "custom"; label: string }>();
 
 export function registryKey(sessionId: string): string {
   return sessionId;
@@ -21,17 +20,8 @@ export function getPool(sessionId: string): Pool | undefined {
   return pools.get(registryKey(sessionId));
 }
 
-export function setDbInfo(sessionId: string, info: { mode: "demo" | "custom"; label: string }): void {
-  dbInfos.set(registryKey(sessionId), info);
-}
-
-export function getDbInfo(sessionId: string): { mode: "demo" | "custom"; label: string } | undefined {
-  return dbInfos.get(registryKey(sessionId));
-}
-
 export async function disconnectSession(sessionId: string): Promise<void> {
   const key = registryKey(sessionId);
-  dbInfos.delete(key);
   const p = pools.get(key);
   if (p) {
     pools.delete(key);
@@ -57,4 +47,37 @@ export function createCustomPool(payload: CustomDbPayload): Pool {
       ssl: payload.ssl ?? true,
     }),
   );
+}
+
+// Added to securely rehydrate DB connections on Vercel cold starts
+import { introspectSchema } from "./schema-introspection.js";
+import { getSchema, setSchema } from "./schema-cache.js";
+
+export async function ensureConnectionAndSchema(session: any): Promise<{ pool: Pool; schema: any } | undefined> {
+  const sid = session?.sid;
+  if (!sid) return undefined;
+
+  let pool = getPool(sid);
+  if (!pool) {
+    if (session?.db?.mode === "demo") {
+      pool = createDemoPool();
+    } else if (session?.db?.mode === "custom" && session?.db?.payload) {
+      pool = createCustomPool(session.db.payload);
+    }
+    if (pool) setPool(sid, pool);
+  }
+
+  if (!pool) return undefined;
+
+  let schema = getSchema(sid);
+  if (!schema) {
+    try {
+      schema = await introspectSchema(pool);
+      setSchema(sid, schema);
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  return { pool, schema };
 }

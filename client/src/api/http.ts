@@ -29,7 +29,12 @@ export async function apiFetch<T>(
       ...(init?.headers as Record<string, string> ?? {}),
     },
   });
-  const data = await parseJson<{ error?: string } & T>(res);
+  const data = await parseJson<{ error?: string; token?: string } & T>(res);
+  
+  if (data.token) {
+    localStorage.setItem("bi_token", data.token);
+  }
+  
   if (!res.ok) {
     const err =
       typeof data.error === "string" ? data.error : `HTTP ${res.status}`;

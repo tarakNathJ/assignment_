@@ -5,11 +5,10 @@ import {
   createDemoPool,
   disconnectSession,
   setPool,
-  setDbInfo,
-  getDbInfo,
 } from "../services/connection-registry.js";
 import { introspectSchema } from "../services/schema-introspection.js";
 import { setSchema, clearSchema } from "../services/schema-cache.js";
+import { encryptSession } from "../services/crypto-session.js";
 
 const customSchema = z.object({
   host: z.string().min(1),
@@ -31,8 +30,10 @@ export async function connectDemoHandler(req: Request, res: Response): Promise<v
     setPool(sid, pool);
     const summary = await introspectSchema(pool);
     setSchema(sid, summary);
-    setDbInfo(sid, { mode: "demo", label: "Demo ecommerce" });
-    res.json({ ok: true, db: getDbInfo(sid), schemaSummary: summary });
+    
+    req.session.db = { mode: "demo", label: "Demo ecommerce" };
+    const token = encryptSession(req.session);
+    res.json({ ok: true, db: req.session.db, schemaSummary: summary, token });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Connect failed";
     res.status(400).json({ error: msg });
@@ -55,11 +56,14 @@ export async function connectCustomHandler(req: Request, res: Response): Promise
     setPool(sid, pool);
     const summary = await introspectSchema(pool);
     setSchema(sid, summary);
-    setDbInfo(sid, {
+    
+    req.session.db = {
       mode: "custom",
       label: `${parsed.data.host}/${parsed.data.database}`,
-    });
-    res.json({ ok: true, db: getDbInfo(sid), schemaSummary: summary });
+      payload: parsed.data,
+    };
+    const token = encryptSession(req.session);
+    res.json({ ok: true, db: { mode: "custom", label: req.session.db.label }, schemaSummary: summary, token });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Connect failed";
     res.status(400).json({ error: msg });

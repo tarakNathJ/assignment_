@@ -27,12 +27,14 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 
+import { decryptSession } from "./services/crypto-session.js";
+
 const isVercel = !!process.env.VERCEL || env.nodeEnv === "production";
 
 app.use(
   cookieSession({
     name: "bi.sid",
-    keys: [env.sessionSecret], // 'keys' is preferred over 'secret'
+    keys: [env.sessionSecret],
     httpOnly: true,
     sameSite: isVercel ? "none" : "lax",
     secure: isVercel,
@@ -40,16 +42,15 @@ app.use(
   }),
 );
 
-// Bearer Token Fallback (bypasses 3rd-party cookie blocks)
+// Encrypted Stateless Token Fallback
 app.use((req, res, next) => {
   const auth = req.headers.authorization;
   if (auth && auth.startsWith("Bearer ")) {
     const token = auth.substring(7);
-    if (!req.session) {
-      req.session = {} as any;
+    const decoded = decryptSession(token);
+    if (decoded) {
+      req.session = decoded;
     }
-    (req.session as any).authed = true;
-    (req.session as any).sid = token;
   }
   next();
 });

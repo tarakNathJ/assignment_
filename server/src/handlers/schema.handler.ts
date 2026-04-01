@@ -1,36 +1,26 @@
 import type { Request, Response } from "express";
-import { getPool } from "../services/connection-registry.js";
-import { getSchema, setSchema } from "../services/schema-cache.js";
+import { ensureConnectionAndSchema } from "../services/connection-registry.js";
 import { introspectSchema } from "../services/schema-introspection.js";
+import { setSchema } from "../services/schema-cache.js";
 
-export function getSchemaHandler(req: Request, res: Response): void {
-  const sid = req.session?.sid;
-  if (!sid) {
-    res.status(401).json({ error: "No session" });
-    return;
-  }
-  const cached = getSchema(sid);
-  if (!cached) {
+export async function getSchemaHandler(req: Request, res: Response): Promise<void> {
+  const connection = await ensureConnectionAndSchema(req.session);
+  if (!connection) {
     res.status(400).json({ error: "No schema cached; connect again" });
     return;
   }
-  res.json(cached);
+  res.json(connection.schema);
 }
 
 export async function refreshSchemaHandler(req: Request, res: Response): Promise<void> {
-  const sid = req.session?.sid;
-  if (!sid) {
-    res.status(401).json({ error: "No session" });
-    return;
-  }
-  const pool = getPool(sid);
-  if (!pool) {
+  const connection = await ensureConnectionAndSchema(req.session);
+  if (!connection) {
     res.status(400).json({ error: "No connection" });
     return;
   }
   try {
-    const summary = await introspectSchema(pool);
-    setSchema(sid, summary);
+    const summary = await introspectSchema(connection.pool);
+    setSchema(req.session?.sid, summary);
     res.json(summary);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Introspection failed";

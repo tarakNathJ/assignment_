@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { getPool } from "../services/connection-registry.js";
-import { getSchema } from "../services/schema-cache.js";
+import {
+  ensureConnectionAndSchema,
+} from "../services/connection-registry.js";
 import { generateSqlWithRetry } from "../services/llm/llm-router.js";
 import {
   schemaPrompt,
@@ -36,13 +37,12 @@ export async function nlQueryHandler(req: Request, res: Response): Promise<void>
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
-  const sid = req.session?.sid;
-  const pool = sid ? getPool(sid) : undefined;
-  const schema = sid ? getSchema(sid) : undefined;
-  if (!pool || !schema) {
+  const connection = await ensureConnectionAndSchema(req.session);
+  if (!connection) {
     res.status(400).json({ error: "Connect a database first" });
     return;
   }
+  const { pool, schema } = connection;
 
   const { message, provider, apiKey: rawKey, model, conversation } = parsed.data;
   const fromEnv = provider === "groq" ? env.groqApiKey : "";
