@@ -14,7 +14,7 @@ export const env = {
   sessionSecret: required("SESSION_SECRET", "dev-only-change-in-production"),
   demoAuthUser: process.env.DEMO_AUTH_USER ?? "demo",
   demoAuthPassword: process.env.DEMO_AUTH_PASSWORD ?? "demo",
-  corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+  corsOrigin: "*",
   demoDatabaseUrl: process.env.DEMO_DATABASE_URL ?? process.env.DATABASE_URL ?? "",
   statementTimeoutMs: parseInt(process.env.STATEMENT_TIMEOUT_MS ?? "25000", 10),
   maxResultRows: parseInt(process.env.MAX_RESULT_ROWS ?? "500", 10),

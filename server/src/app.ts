@@ -10,7 +10,7 @@ const app = express();
 app.set("trust proxy", 1);
 app.use(
   cors({
-    origin: env.corsOrigin,
+    origin: env.corsOrigin === "*" ? true : env.corsOrigin,
     credentials: true,
   }),
 );
