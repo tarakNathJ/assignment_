@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import session from "express-session";
+import cookieSession from "cookie-session";
 import { env } from "./config/env.js";
 import { router } from "./routes/index.js";
 import { errorHandler } from "./middleware/error-handler.js";
@@ -17,19 +17,16 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 app.use(
-  session({
+  cookieSession({
     name: "bi.sid",
     secret: env.sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: env.nodeEnv === "production" ? "none" : "lax",
-      secure: env.nodeEnv === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    },
+    httpOnly: true,
+    sameSite: env.nodeEnv === "production" ? "none" : "lax",
+    secure: env.nodeEnv === "production",
+    maxAge: 1000 * 60 * 60 * 24 * 7,
   }),
 );
+
 app.use("/api", router);
 app.use(errorHandler);
 
