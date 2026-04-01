@@ -1,11 +1,13 @@
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
 import { v4 as uuid } from "uuid";
 import type { DashboardRecord, DashboardWidget } from "../types/dashboard.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, "..", "..", "data");
+const isVercel = process.env.VERCEL === "1";
+const DATA_DIR = isVercel ? tmpdir() : join(__dirname, "..", "..", "data");
 const STORE_PATH = join(DATA_DIR, "dashboards.json");
 
 interface StoreFile {
