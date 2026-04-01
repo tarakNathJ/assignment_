@@ -33,6 +33,8 @@ app.use(
 app.use("/api", router);
 app.use(errorHandler);
 
-app.listen(env.port, () => {
-  console.log(`[server] Listening on port ${env.port} (${env.nodeEnv})`);
-});
+// app.listen(env.port, () => {
+//   console.log(`[server] Listening on port ${env.port} (${env.nodeEnv})`);
+// });
+
+export default app;
