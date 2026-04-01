@@ -16,12 +16,9 @@ import {
   Globe,
   Cpu,
   BarChart3,
-  Activity,
   Clock,
   ChevronRight,
   Terminal,
-  Server,
-  Database,
   RefreshCw,
 } from "lucide-react";
 import * as dashApi from "../api/dashboard";

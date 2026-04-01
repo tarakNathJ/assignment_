@@ -50,44 +50,9 @@ function fakeHex() {
 const SOURCES = ["Production-API", "Batch-Scheduler", "Internal-CLI", "Web-Interface", "Analytics-SDK"];
 const RESOURCES = ["8 Core / 32GB", "16 Core / 64GB", "1 Core / 2GB", "4 Core / 16GB", "8 Core / 32GB"];
 
-// Animated number that counts up
-function AnimNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const step = target / 30;
-    const t = setInterval(() => {
-      start += step;
-      if (start >= target) { setVal(target); clearInterval(t); }
-      else setVal(Math.round(start));
-    }, 30);
-    return () => clearInterval(t);
-  }, [target]);
-  return <>{val.toLocaleString()}{suffix}</>;
-}
 
-// Mini bar chart sparkline
-function MiniBarChart({ count }: { count: number }) {
-  const bars = Array.from({ length: 12 }, (_, i) => ({
-    height: Math.random() * 70 + 15,
-    isActive: i === 6 || i === 7,
-  }));
-  return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 52, padding: "0 4px" }}>
-      {bars.map((b, i) => (
-        <div key={i} style={{
-          flex: 1, borderRadius: 2,
-          height: `${count > 0 ? b.height : 20}%`,
-          background: b.isActive
-            ? "linear-gradient(to top, #a855f7, #6366f1)"
-            : "rgba(168,85,247,0.2)",
-          transition: "height 0.5s ease",
-          boxShadow: b.isActive ? "0 0 6px rgba(168,85,247,0.5)" : "none",
-        }} />
-      ))}
-    </div>
-  );
-}
+
+
 
 // Throughput sparkline (cyan)
 function ThroughputChart() {
@@ -202,9 +167,7 @@ export function DashboardEditorPage() {
     setDash({ ...dash, widgets: dash.widgets.map(w => w.id === widget.id ? { ...w, chartType: nextType } : w) });
   }
 
-  function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-  }
+
 
   const timeStr = currentTime.toLocaleTimeString("en-US", { hour12: false });
   const dateStr = currentTime.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }).toUpperCase();
