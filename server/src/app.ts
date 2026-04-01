@@ -7,19 +7,30 @@ import { router } from "./routes/index.js";
 import { errorHandler } from "./middleware/error-handler.js";
 
 const app = express();
-app.set("trust proxy", 1);
+
+// Trust Vercel proxy for secure cookies
+app.set("trust proxy", true);
+
 app.use(
   cors({
-    origin: env.corsOrigin === "*" ? true : env.corsOrigin,
+    origin: (origin, callback) => {
+      // Allow all origins specifically for cross-domain credentials
+      callback(null, origin || true);
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie", "X-Requested-With", "Accept"],
+    exposedHeaders: ["set-cookie"],
   }),
 );
+
 app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
+
 app.use(
   cookieSession({
     name: "bi.sid",
-    secret: env.sessionSecret,
+    keys: [env.sessionSecret], // 'keys' is preferred over 'secret'
     httpOnly: true,
     sameSite: env.nodeEnv === "production" ? "none" : "lax",
     secure: env.nodeEnv === "production",
