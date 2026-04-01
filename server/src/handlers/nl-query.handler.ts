@@ -36,8 +36,9 @@ export async function nlQueryHandler(req: Request, res: Response): Promise<void>
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
-  const pool = getPool(req.sessionID);
-  const schema = getSchema(req.sessionID);
+  const sid = req.session?.sid;
+  const pool = sid ? getPool(sid) : undefined;
+  const schema = sid ? getSchema(sid) : undefined;
   if (!pool || !schema) {
     res.status(400).json({ error: "Connect a database first" });
     return;

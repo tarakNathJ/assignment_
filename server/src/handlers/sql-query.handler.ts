@@ -14,7 +14,8 @@ export async function sqlQueryHandler(req: Request, res: Response): Promise<void
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
-  const pool = getPool(req.sessionID);
+  const sid = req.session?.sid;
+  const pool = sid ? getPool(sid) : undefined;
   if (!pool) {
     res.status(400).json({ error: "No connection" });
     return;

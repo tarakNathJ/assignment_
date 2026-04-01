@@ -20,13 +20,15 @@ const customSchema = z.object({
 
 export async function connectDemoHandler(req: Request, res: Response): Promise<void> {
   try {
-    await disconnectSession(req.sessionID);
-    clearSchema(req.sessionID);
+    const sid = req.session?.sid;
+    if (!sid) throw new Error("No session ID");
+    await disconnectSession(sid);
+    clearSchema(sid);
     const pool = createDemoPool();
     await pool.query("SELECT 1");
-    setPool(req.sessionID, pool);
+    setPool(sid, pool);
     const summary = await introspectSchema(pool);
-    setSchema(req.sessionID, summary);
+    setSchema(sid, summary);
     req.session.db = { mode: "demo", label: "Demo ecommerce" };
     res.json({ ok: true, db: req.session.db, schemaSummary: summary });
   } catch (e) {
@@ -42,13 +44,15 @@ export async function connectCustomHandler(req: Request, res: Response): Promise
     return;
   }
   try {
-    await disconnectSession(req.sessionID);
-    clearSchema(req.sessionID);
+    const sid = req.session?.sid;
+    if (!sid) throw new Error("No session ID");
+    await disconnectSession(sid);
+    clearSchema(sid);
     const pool = createCustomPool(parsed.data);
     await pool.query("SELECT 1");
-    setPool(req.sessionID, pool);
+    setPool(sid, pool);
     const summary = await introspectSchema(pool);
-    setSchema(req.sessionID, summary);
+    setSchema(sid, summary);
     req.session.db = {
       mode: "custom",
       label: `${parsed.data.host}/${parsed.data.database}`,
@@ -62,8 +66,11 @@ export async function connectCustomHandler(req: Request, res: Response): Promise
 
 export async function disconnectDbHandler(req: Request, res: Response): Promise<void> {
   try {
-    await disconnectSession(req.sessionID);
-    clearSchema(req.sessionID);
+    const sid = req.session?.sid;
+    if (sid) {
+      await disconnectSession(sid);
+      clearSchema(sid);
+    }
     req.session.db = undefined;
     res.json({ ok: true });
   } catch (e) {
