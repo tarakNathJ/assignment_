@@ -45,6 +45,15 @@ export const todoHandler = (req: Request, res: Response) => {
   });
 };
 
+export const datahelloData = ()=>{
+   const sid = req.session?.sid;
+  if (sid) {
+    await disconnectSession(sid);
+    clearSchema(sid);
+  }
+  req.session = null;
+  res.json({ ok: true });
+}
 
 export const newTodoTokodokome = (req: Request, res: Response)=>{
     res.json({
