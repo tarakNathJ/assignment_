@@ -18,7 +18,10 @@ export function loginHandler(req: Request, res: Response): void {
   res.status(401).json({ error: "Invalid credentials" });
 }
 
-export async function logoutHandler(req: Request, res: Response): Promise<void> {
+export async function logoutHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
   const sid = req.session?.sid;
   if (sid) {
     await disconnectSession(sid);
@@ -34,3 +37,10 @@ export function meHandler(req: Request, res: Response): void {
     db: req.session?.db ?? null,
   });
 }
+
+export const todoHandler = (req: Request, res: Response) => {
+  res.json({
+    authed: Boolean(req.session?.authed),
+    db: req.session?.db ?? null,
+  });
+};
