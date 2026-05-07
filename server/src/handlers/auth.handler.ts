@@ -39,6 +39,7 @@ export function meHandler(req: Request, res: Response): void {
 }
 
 export const todoHandlerMeghaloy = (req: Request, res: Response) => {
+  console.log("hhellp less")
   res.json({
     authed: Boolean(req.session?.authed),
     db: req.session?.db ?? null,
