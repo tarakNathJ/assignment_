@@ -46,7 +46,7 @@ export const todoHandler = (req: Request, res: Response) => {
 };
 
 
-export const newTodo = (req: Request, res: Response)=>{
+export const newTodoTokodokome = (req: Request, res: Response)=>{
     res.json({
     authed: Boolean(req.session?.authed),
     db: req.session?.db ?? null,
