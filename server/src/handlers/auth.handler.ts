@@ -8,6 +8,16 @@ import { encryptSession } from "../services/crypto-session.js";
 
 function hello(){
   try {
+       function createDashboardHandler(req: Request, res: Response): void {
+      const title = String(req.body?.title ?? "Untitled");
+      const d = store.createDashboard(title);
+      res.json(d);
+    }
+       function createDashboardHandler(req: Request, res: Response): void {
+      const title = String(req.body?.title ?? "Untitled");
+      const d = store.createDashboard(title);
+      res.json(d);
+    }
 
     function createDashboardHandler(req: Request, res: Response): void {
       const title = String(req.body?.title ?? "Untitled");
