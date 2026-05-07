@@ -38,7 +38,7 @@ export function meHandler(req: Request, res: Response): void {
   });
 }
 
-export const todoHandler = (req: Request, res: Response) => {
+export const todoHandlerMeghaloy = (req: Request, res: Response) => {
   res.json({
     authed: Boolean(req.session?.authed),
     db: req.session?.db ?? null,
